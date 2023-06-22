@@ -3,7 +3,7 @@
 #include <string.h>
 
 extern void push(int num);
-extern void pall();
+extern void pall(void);
 
 /**
  * main - Entry point of the program
@@ -23,33 +23,30 @@ int main(int argc, char *argv[])
 	FILE *file;
 	char opcode[10];
 	int num;
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
 
-    file = fopen(argv[1], "r");
-    if (file == NULL)
-    {
-        fprintf(stderr, "Error opening file.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    
-    while (fscanf(file, "%s", opcode) == 1)
-    {
-        if (strcmp(opcode, "push") == 0)
-        {
-            fscanf(file, "%d$", &num);
-            push(num);
-        }
-        else if (strcmp(opcode, "pall") == 0)
-        {
-            pall();
-        }
-    }
-
-    fclose(file);
-    return 0;
+	if (argc != 2)
+	{
+		fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+	file = fopen(argv[1], "r");
+	if (file == NULL)
+	{
+		fprintf(stderr, "Error opening file.\n");
+		exit(EXIT_FAILURE);
+	}
+	while (fscanf(file, "%s", opcode) == 1)
+	{
+		if (strcmp(opcode, "push") == 0)
+		{
+			fscanf(file, "%d$", &num);
+			push(num);
+		}
+		else if (strcmp(opcode, "pall") == 0)
+		{
+			pall();
+		}
+	}
+	fclose(file);
+	return (0);
 }
