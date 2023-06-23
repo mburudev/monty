@@ -2,19 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define STACK_SIZE 100
+extern void push(int num);
+extern void pall();
 
-extern void push(int stack[], int *top, int num);
-extern void pall(int stack[], int top);
-
+/**
+ * main - Entry point of the program
+ * @argc: Number of command-line arguments
+ * @argv: Array of command-line arguments
+ *
+ * Return: 0 on success, 1 on failure
+ *
+ * Description:
+ * This function is the entry point of the program. It reads a file
+ * containing bytecode instructions and executes the corresponding operations.
+ * The "push" instruction pushes an integer onto the stack, and the "pall"
+ * instruction prints all the values on the stack.
+ */
 int main(int argc, char *argv[])
 {
-    int stack[STACK_SIZE];
-    int top = -1;
-    FILE *file;
-    char opcode[10];
-    int num;
-
+	FILE *file;
+	char opcode[10];
+	int num;
     if (argc != 2)
     {
         fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
@@ -28,20 +36,17 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    
     while (fscanf(file, "%s", opcode) == 1)
     {
         if (strcmp(opcode, "push") == 0)
         {
-            if (fscanf(file, "%d", &num) != 1)
-            {
-                fprintf(stderr, "[stderr]: L%d: usage: push integer\n", __LINE__);
-                exit(EXIT_FAILURE);
-            }
-            push(stack, &top, num);
+            fscanf(file, "%d$", &num);
+            push(num);
         }
         else if (strcmp(opcode, "pall") == 0)
         {
-            pall(stack, top);
+            pall();
         }
     }
 
