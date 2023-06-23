@@ -1,56 +1,103 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-extern void push(int num);
-extern void pall();
+#include "monty.h"
 
 /**
- * main - Entry point of the program
- * @argc: Number of command-line arguments
- * @argv: Array of command-line arguments
+ * execute - executes opcodes
+ * @string: contents of file
+ * @stack: the list
  *
- * Return: 0 on success, 1 on failure
- *
- * Description:
- * This function is the entry point of the program. It reads a file
- * containing bytecode instructions and executes the corresponding operations.
- * The "push" instruction pushes an integer onto the stack, and the "pall"
- * instruction prints all the values on the stack.
+ * Return: void
  */
-int main(int argc, char *argv[])
+void execute(char *string[], stack_t *stack);
+
+/**
+ * main - monty interpreter
+ * @ac: the number of arguments
+ * @av: the arguments
+ *
+ * Return: Always 0 on success
+ */
+int main(int ac, char *av[])
 {
-	char opcode[10];
-    int num;
-    FILE *file;
-    
-    if (argc != 2)
-    {
-        fprintf(stderr, "USAGE: monty file\n");
-        exit(EXIT_FAILURE);
-    }
+	stack_t *stack = NULL;
+	static char *string[1000] = {NULL};
+	int n = 0;
+	FILE *fd;
+	size_t bufsize = 1000;
+	int result;
 
-    file = fopen(argv[1], "r");
-    if (file == NULL)
-    {
-        fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
+	if (ac != 2)
+	{
+		fprintf(stderr, "USAGE: monty file\n");
+		exit(EXIT_FAILURE);
+	}
 
-    while (fscanf(file, "%s", opcode) == 1)
-    {
-        if (strcmp(opcode, "push") == 0)
-        {
-            fscanf(file, "%d$", &num);
-            push(num);
-        }
-        else if (strcmp(opcode, "pall") == 0)
-        {
-            pall();
-        }
-    }
+	fd = fopen(av[1], "r");
+	if (fd == NULL)
+	{
+		fprintf(stderr, "Error: Can't open file %s\n", av[1]);
+		exit(EXIT_FAILURE);
+	}
 
-    fclose(file);
-    return 0;
+	for (n = 0; ; n++)
+	{
+		result = getline(&(string[n]), &bufsize, fd);
+		if (result <= 0)
+			break;
+	}
+
+	execute(string, stack);
+	free_list(string);
+	fclose(fd);
+
+	return (EXIT_SUCCESS);
+}
+
+/**
+ * execute - executes opcodes
+ * @string: contents of file
+ * @stack: the list
+ *
+ * Return: void
+ */
+void execute(char *string[], stack_t *stack)
+{
+	int ln, n, i;
+
+	instruction_t st[] = {
+		{"pall", pall},
+		{"pint", pint},
+		{"add", add},
+		{"swap", swap},
+		{"pop", pop},
+		{"null", NULL}
+	};
+
+	for (ln = 1, n = 0; string[n + 1]; n++, ln++)
+	{
+		if (_strcmp("push", string[n]))
+			push(&stack, ln, pushint(string[n], ln));
+		else if (_strcmp("nop", string[n]))
+			;
+		else
+		{
+			i = 0;
+			while (!_strcmp(st[i].opcode, "null"))
+			{
+				if (_strcmp(st[i].opcode, string[n]))
+				{
+					st[i].f(&stack, ln);
+					break;
+				}
+				i++;
+			}
+			if (_strcmp(st[i].opcode, "null") && !_strcmp(string[n], "\n"))
+			{
+				fprintf(stderr, "L%u: unknown instruction %s", ln, string[n]);
+				if (!nlfind(string[n]))
+					fprintf(stderr, "\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	free_stack(stack);
 }

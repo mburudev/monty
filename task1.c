@@ -26,7 +26,7 @@ void add(stack_t **stack, unsigned int line_num)
 }
 
 /**
- * pint - Prints value at top of stack.
+ * pint - Prints the value at top of stack.
  * @stack: pointer to head of stack
  * @line_num: file's line number
  * Return: Void
