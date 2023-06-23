@@ -20,4 +20,5 @@ void push(int num)
     }
 
     stack[++top] = num;
+    printf("%d\n", num);
 }
