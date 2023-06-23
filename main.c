@@ -32,7 +32,11 @@ int main(int argc, char *argv[])
     {
         if (strcmp(opcode, "push") == 0)
         {
-            fscanf(file, "%d", &num);
+            if (fscanf(file, "%d", &num) != 1)
+            {
+                fprintf(stderr, "[stderr]: L%d: usage: push integer\n", __LINE__);
+                exit(EXIT_FAILURE);
+            }
             push(stack, &top, num);
         }
         else if (strcmp(opcode, "pall") == 0)
@@ -44,4 +48,3 @@ int main(int argc, char *argv[])
     fclose(file);
     return 0;
 }
-
